@@ -13,6 +13,8 @@ import (
 	"github.com/syepes/network_exporter/pkg/mtr"
 )
 
+const MaxConcurrentJobs = 2
+
 // MTR Object
 type MTR struct {
 	logger   log.Logger
@@ -63,6 +65,8 @@ func (t *MTR) run(startupDelay time.Duration) {
 		}
 	}
 
+	waitChan := make(chan struct{}, MaxConcurrentJobs)
+
 	tick := time.NewTicker(t.interval)
 	for {
 		select {
@@ -71,7 +75,11 @@ func (t *MTR) run(startupDelay time.Duration) {
 			t.wg.Done()
 			return
 		case <-tick.C:
-			go t.mtr()
+			waitChan <- struct{}{}
+			go func() {
+				t.mtr()
+				<-waitChan
+			}()
 		}
 	}
 }

@@ -28,7 +28,7 @@ const version string = "1.6.1"
 
 var (
 	listenAddress  = kingpin.Flag("web.listen-address", "The address to listen on for HTTP requests").Default(":9427").String()
-	configFile     = kingpin.Flag("config.file", "Exporter configuration file").Default("/network_exporter.yml").String()
+	configFile     = kingpin.Flag("config.file", "Exporter configuration file").Default("/app/network_exporter.yml").String()
 	sc             = &config.SafeConfig{Cfg: &config.Config{}}
 	logger         log.Logger
 	icmpID         *common.IcmpID // goroutine shared counter

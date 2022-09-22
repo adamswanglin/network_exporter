@@ -62,6 +62,8 @@ func (t *PING) run(startupDelay time.Duration) {
 		}
 	}
 
+	waitChan := make(chan struct{}, MaxConcurrentJobs)
+
 	tick := time.NewTicker(t.interval)
 	for {
 		select {
@@ -70,7 +72,11 @@ func (t *PING) run(startupDelay time.Duration) {
 			t.wg.Done()
 			return
 		case <-tick.C:
-			go t.ping()
+			waitChan <- struct{}{}
+			go func() {
+				t.ping()
+				<-waitChan
+			}()
 		}
 	}
 }
