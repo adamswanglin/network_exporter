@@ -10,13 +10,17 @@ import (
 )
 
 var (
-	icmpLabelNames  = []string{"name", "target", "target_ip"}
-	icmpStatusDesc  = prometheus.NewDesc("ping_status", "Ping Status", icmpLabelNames, nil)
-	icmpRttDesc     = prometheus.NewDesc("ping_rtt_seconds", "Round Trip Time in seconds", append(icmpLabelNames, "type"), nil)
-	icmpLossDesc    = prometheus.NewDesc("ping_loss_percent", "Packet loss in percent", icmpLabelNames, nil)
-	icmpTargetsDesc = prometheus.NewDesc("ping_targets", "Number of active targets", nil, nil)
-	icmpStateDesc   = prometheus.NewDesc("ping_up", "Exporter state", nil, nil)
-	icmpMutex       = &sync.Mutex{}
+	icmpLabelNames         = []string{"name", "target", "target_ip"}
+	icmpStatusDesc         = prometheus.NewDesc("ping_status", "Ping Status", icmpLabelNames, nil)
+	icmpRttDesc            = prometheus.NewDesc("ping_rtt_seconds", "Round Trip Time in seconds", append(icmpLabelNames, "type"), nil)
+	icmpLossDesc           = prometheus.NewDesc("ping_loss_percent", "Packet loss in percent", icmpLabelNames, nil)
+	icmpTargetsDesc        = prometheus.NewDesc("ping_targets", "Number of active targets", nil, nil)
+	icmpStateDesc          = prometheus.NewDesc("ping_up", "Exporter state", nil, nil)
+	icmpSntSummaryDesc     = prometheus.NewDesc("ping_snt_count", "Packet sent count", nil, nil)
+	icmpSntFailSummaryDesc = prometheus.NewDesc("ping_snt_fail_count", "Packet sent fail count", nil, nil)
+	icmpSntTimeSummaryDesc = prometheus.NewDesc("ping_snt_seconds", "Packet sent time total", nil, nil)
+
+	icmpMutex = &sync.Mutex{}
 )
 
 // PING prom
@@ -65,6 +69,9 @@ func (p *PING) Collect(ch chan<- prometheus.Metric) {
 		icmpStatusDesc = prometheus.NewDesc("ping_status", "Ping Status", icmpLabelNames, l2)
 		icmpRttDesc = prometheus.NewDesc("ping_rtt_seconds", "Round Trip Time in seconds", append(icmpLabelNames, "type"), l2)
 		icmpLossDesc = prometheus.NewDesc("ping_loss_percent", "Packet loss in percent", icmpLabelNames, l2)
+		icmpSntSummaryDesc = prometheus.NewDesc("ping_snt_count", "Packet sent count", icmpLabelNames, l2)
+		icmpSntFailSummaryDesc = prometheus.NewDesc("ping_snt_fail_count", "Packet sent fail count", icmpLabelNames, l2)
+		icmpSntTimeSummaryDesc = prometheus.NewDesc("ping_snt_seconds", "Packet sent time total", icmpLabelNames, l2)
 
 		if metric.Success {
 			ch <- prometheus.MustNewConstMetric(icmpStatusDesc, prometheus.GaugeValue, 1, l...)
@@ -81,6 +88,11 @@ func (p *PING) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.MustNewConstMetric(icmpRttDesc, prometheus.GaugeValue, metric.CorrectedSDTime.Seconds(), append(l, "csd")...)
 		ch <- prometheus.MustNewConstMetric(icmpRttDesc, prometheus.GaugeValue, metric.RangeTime.Seconds(), append(l, "range")...)
 		ch <- prometheus.MustNewConstMetric(icmpLossDesc, prometheus.GaugeValue, metric.DropRate, l...)
+
+		ch <- prometheus.MustNewConstMetric(icmpSntSummaryDesc, prometheus.GaugeValue, float64(metric.SntSummary), l...)
+		ch <- prometheus.MustNewConstMetric(icmpSntFailSummaryDesc, prometheus.GaugeValue, float64(metric.SntFailSummary), l...)
+		ch <- prometheus.MustNewConstMetric(icmpSntTimeSummaryDesc, prometheus.GaugeValue, metric.SntTimeSummary.Seconds(), l...)
+
 	}
 	ch <- prometheus.MustNewConstMetric(icmpTargetsDesc, prometheus.GaugeValue, float64(len(targets)))
 }

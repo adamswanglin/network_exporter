@@ -47,6 +47,7 @@ func NewPing(logger log.Logger, icmpID *common.IcmpID, startupDelay time.Duratio
 		count:    count,
 		labels:   labels,
 		stop:     make(chan struct{}),
+		result:   &ping.PingResult{},
 	}
 	t.wg.Add(1)
 	go t.run(startupDelay)
@@ -95,6 +96,9 @@ func (t *PING) ping() {
 
 	t.Lock()
 	defer t.Unlock()
+	data.SntSummary += t.result.SntSummary
+	data.SntFailSummary += t.result.SntFailSummary
+	data.SntTimeSummary += t.result.SntTimeSummary
 	t.result = data
 }
 

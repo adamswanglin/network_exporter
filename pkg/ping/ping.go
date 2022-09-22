@@ -107,6 +107,9 @@ func runPing(ipAddr string, ip string, srcAddr string, icmpID int, option *PingO
 	pingResult.UncorrectedSDTime = time.Duration(common.TimeUncorrectedDeviation(pingReturn.allTime))
 	pingResult.CorrectedSDTime = time.Duration(common.TimeCorrectedDeviation(pingReturn.allTime))
 	pingResult.RangeTime = time.Duration(common.TimeRange(pingReturn.allTime))
+	pingResult.SntSummary = option.Count()
+	pingResult.SntFailSummary = option.Count() - pingReturn.succSum
+	pingResult.SntTimeSummary = time.Duration(common.TimeRange(pingReturn.allTime))
 
 	return pingResult, nil
 }
