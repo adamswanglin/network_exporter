@@ -10,5 +10,6 @@ RUN addgroup  -g 1002 non-root && adduser  -s /sbin/nologin --disabled-password 
 WORKDIR /app
 COPY --from=builder --chown=non-root:non-root /app/network_exporter network_exporter
 COPY --from=builder --chown=non-root:non-root /app/network_exporter.yml /app/network_exporter.yml
+USER non-root
 CMD /app/network_exporter
 EXPOSE 9427
