@@ -6,10 +6,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o network_exporter 
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
-RUN addgroup  -g 1002 non-root && adduser  -s /sbin/nologin --disabled-password --no-create-home --uid 1001 --ingroup non-root non-root
 WORKDIR /app
-COPY --from=builder --chown=non-root:non-root /app/network_exporter network_exporter
-COPY --from=builder --chown=non-root:non-root /app/network_exporter.yml /app/network_exporter.yml
-USER non-root
+COPY --from=builder /app/network_exporter network_exporter
+COPY --from=builder /app/network_exporter.yml /app/network_exporter.yml
 CMD /app/network_exporter
 EXPOSE 9427
