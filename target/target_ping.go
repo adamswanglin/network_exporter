@@ -102,9 +102,9 @@ func (t *PING) ping() {
 
 	t.Lock()
 	defer t.Unlock()
-	data.SntSummary += t.result.SntSummary
-	data.SntFailSummary += t.result.SntFailSummary
-	data.SntTimeSummary += t.result.SntTimeSummary
+	t.result.SntSummary += data.SntSummary
+	t.result.SntFailSummary += data.SntFailSummary
+	t.result.SntTimeSummary += data.SntTimeSummary
 	t.result = data
 }
 
