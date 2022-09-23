@@ -64,13 +64,13 @@ func runPing(ipAddr string, ip string, srcAddr string, icmpID int, option *PingO
 	seq := 0
 	for cnt := 0; cnt < option.Count(); cnt++ {
 		icmpReturn, err := icmp.Icmp(ip, srcAddr, ttl, pid, timeout, seq)
-		if err != nil {
-			pingResult.Success = false
-			pingResult.DropRate = 1.0
-			return pingResult, err
-		}
+		//if err != nil {
+		//	pingResult.Success = false
+		//	pingResult.DropRate = 1.0
+		//	return pingResult, err
+		//}
 
-		if !icmpReturn.Success || !common.IsEqualIP(ip, icmpReturn.Addr) {
+		if err != nil || !icmpReturn.Success || !common.IsEqualIP(ip, icmpReturn.Addr) {
 			continue
 		}
 
@@ -89,12 +89,6 @@ func runPing(ipAddr string, ip string, srcAddr string, icmpID int, option *PingO
 
 		seq++
 		time.Sleep(interval)
-	}
-
-	if !pingReturn.success {
-		pingResult.Success = false
-		pingResult.DropRate = 1.0
-		return pingResult, nil
 	}
 
 	pingResult.Success = pingReturn.success

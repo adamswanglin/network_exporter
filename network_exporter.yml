@@ -23,21 +23,24 @@ http_get:
   timeout: 5s
 
 targets:
-  - name: internal
-    host: 192.168.0.1
-    type: ICMP
-    probe:
-      - hostname1
-      - hostname2
-  - name: google-dns1
-    host: 8.8.8.8
-    type: ICMP
-  - name: google-dns2
-    host: 8.8.4.4
-    type: MTR
-  - name: cloudflare-dns
-    host: 1.1.1.1
-    type: ICMP+MTR
+#  - name: internal
+#    host: 192.168.0.1
+#    type: ICMP
+#    probe:
+#      - hostname1
+#      - hostname2
+#  - name: google-dns1
+#    host: 8.8.8.8
+#    type: ICMP
+#  - name: google-dns2
+#    host: 8.8.4.4
+#    type: MTR
+#  - name: cloudflare-dns
+#    host: 1.1.1.1
+#    type: ICMP+MTR
+#  - name: cloudflare-dns-https
+#    host: 1.1.1.1:443
+#    type: TCP
   - name: cloudflare-dns-https
-    host: 1.1.1.1:443
-    type: TCP
+    host: 192.168.1.1
+    type: ICMP
